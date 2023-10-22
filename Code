@@ -11,7 +11,7 @@ df["Last_Name"] = df["Last_Name"].str.lstrip("...")
 df["Last_Name"] = df["Last_Name"].str.lstrip("/")
 df["Last_Name"] = df["Last_Name"].str.rstrip("_")
 
-# Standardize the different types of format in the 'Phone_Number' column
+# Standardise the different types of format in the 'Phone_Number' column
 df["Phone_Number"] = df["Phone_Number"].str.replace(r'\D', '', regex=True)  # Keep only digits
 
 # Drop rows with 'NaN' values in the 'Phone_Number' column
