@@ -1,0 +1,68 @@
+import pandas as pd
+
+# Load the DataFrame
+df = pd.read_excel(r"C:\Users\User\OneDrive\Email attachments\Documents\Personal work\Employment\Project data\CustomerAddresses.xlsx")
+
+# First of all, drop duplicates
+df = df.drop_duplicates()
+
+# Clean the non-string characters in the 'Last_Name' column
+df["Last_Name"] = df["Last_Name"].str.lstrip("...")
+df["Last_Name"] = df["Last_Name"].str.lstrip("/")
+df["Last_Name"] = df["Last_Name"].str.rstrip("_")
+
+# Standardize the different types of format in the 'Phone_Number' column
+df["Phone_Number"] = df["Phone_Number"].str.replace(r'\D', '', regex=True)  # Keep only digits
+
+# Drop rows with 'NaN' values in the 'Phone_Number' column
+df = df.dropna(subset=["Phone_Number"])
+
+#Drop rows with 'NaN' values in the 'Last_Name' column
+df= df.dropna(subset=["Last_Name"])
+
+# Format the phone number as XXX-XXX-XXXX
+def format_phone_number(phone):
+    return f'{phone[:3]}-{phone[3:6]}-{phone[6:]}'
+
+df["Phone_Number"] = df["Phone_Number"].apply(format_phone_number)
+
+# Remove specific patterns in the 'Phone_Number' column
+df["Phone_Number"] = df["Phone_Number"].str.replace('nan--', '')
+df["Phone_Number"] = df["Phone_Number"].str.replace('Na--', '')
+df["Phone_Number"] = df["Phone_Number"].str.replace('NaN','')
+
+#Split the address column into different columns
+df[["Street_Address", "State", "Zip_Code"]] = df["Address"].str.split(',', expand=True)
+
+# Change values in 'Paying Customer' column from 'Yes' to 'Y' and 'No' to 'N'
+df["Paying Customer"] = df["Paying Customer"].replace({'Yes': 'Y', 'No': 'N'})
+
+# Change values in 'Do_Not_Contact' column from 'Yes' to 'Y' and 'No' to 'N'
+df["Do_Not_Contact"] = df["Do_Not_Contact"].replace({'Yes': 'Y', 'No': 'N'})
+
+# Replace 'N/a' and 'NaN' with an empty string in all columns
+for column in df.columns:
+    df[column] = df[column].replace({'N/a': '', 'NaN': ''})
+
+#We want to remove the values which have not provided phone numbers and also people who have specified that they don't want to be called in the 'Do_Not_Contact' column
+df = df.fillna('')
+
+#Remove rows where customers have specified 'Do_Not_Contact' as 'Y'
+for x in df.index:
+   if df.loc[x,"Do_Not_Contact"]=='Y':
+       df.drop(x,inplace=True)
+
+#Drop rows with missing NaN values in the 'Phone_Number' column
+df.dropna(subset=["Phone_Number"], inplace=True)
+#Reset the DataFrame index to have continous integer values
+df.reset_index(drop=True, inplace=True)
+
+
+
+#Drop unnecessary columns
+columns_to_drop = ['Not_Useful_Column', 'Zip_Code']
+df = df.drop(columns=columns_to_drop)
+
+#Export cleaned dataset to new excel file
+excel_file_path = "final_cleaned_CustomerAddresses_data.xlsx"
+df.to_excel(excel_file_path, index=True)
