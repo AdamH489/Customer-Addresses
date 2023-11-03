@@ -1,5 +1,5 @@
 # Customer-Addresses
-I cleaned a dataset of a company's customers 
+I cleaned a dataset of a company's customers.
 
 The purpose of this project was to display my Python skills with regards to data cleaning. I found a dataset at https://github.com/AlexTheAnalyst/PandasYouTubeSeries/blob/main/Customer%20Call%20List.xlsx which was a relatively small dataset yet it needed to be cleaned. The uncleaned dataset can be seen below:
 
